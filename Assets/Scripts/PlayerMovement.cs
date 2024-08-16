@@ -48,6 +48,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        rb.isKinematic = speedState == SpeedState.Paused;
+
         if (speedState == SpeedState.Paused) return;
 
         float moveSpeed = speedState == SpeedState.RegularSpeed ? regularMoveSpeed : highMoveSpeed;
