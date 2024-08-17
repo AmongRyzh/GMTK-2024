@@ -83,7 +83,7 @@ public class PlayerMovement : MonoBehaviour
 
         float moveSpeed = speedState == SpeedState.RegularSpeed ? regularMoveSpeed : highMoveSpeed;
 
-        rb.velocity = new Vector2(moveSpeed, rb.velocity.y);
+        rb.velocity = new Vector2(moveSpeed * (transform.localScale.x / 2), rb.velocity.y);
 
         scaleSlider.value = transform.localScale.y;
     }
@@ -113,6 +113,10 @@ public class PlayerMovement : MonoBehaviour
         if (other.CompareTag("Jump Pad") && speedState != SpeedState.Paused)
         {
             rb.velocity = Vector2.up * jumpForce;
+        }
+        else if (other.CompareTag("Player Rotator") && speedState != SpeedState.Paused)
+        {
+            transform.localScale = other.transform.localScale;
         }
     }
 
