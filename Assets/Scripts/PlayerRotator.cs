@@ -13,6 +13,6 @@ public class PlayerRotator : MonoBehaviour
 
     private void FixedUpdate()
     {
-        transform.localScale = new Vector2(-FindObjectOfType<PlayerMovement>().transform.localScale.x, transform.localScale.y);
+        transform.localScale = new Vector2(player.transform.localScale.x < 0 ? 2 : -2, transform.localScale.y);
     }
 }

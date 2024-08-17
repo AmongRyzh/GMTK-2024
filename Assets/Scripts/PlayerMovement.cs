@@ -28,15 +28,23 @@ public class PlayerMovement : MonoBehaviour
 
     Vector2 savedVelocity;
 
+    /*bool isGrounded;
+    [SerializeField] Transform feetPos;
+    [SerializeField] float checkRadius;
+    [SerializeField] LayerMask whatIsGround;*/
+
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        scaleSlider = FindObjectOfType<Slider>();
 
         speedState = SpeedState.RegularSpeed;
     }
 
     private void Update()
     {
+        //isGrounded = Physics2D.OverlapCircle(feetPos.position, checkRadius, whatIsGround);
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
             if (speedState == SpeedState.RegularSpeed || speedState == SpeedState.HighSpeed)
