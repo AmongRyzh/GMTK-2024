@@ -24,6 +24,10 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField] private Slider scaleSlider;
 
+    [SerializeField] private float jumpForce;
+
+    Vector2 savedVelocity;
+
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -38,14 +42,19 @@ public class PlayerMovement : MonoBehaviour
             if (speedState == SpeedState.RegularSpeed || speedState == SpeedState.HighSpeed)
             {
                 speedState = SpeedState.Paused;
+                savedVelocity = rb.velocity;
+                rb.velocity = Vector2.zero;
             }
             else
             {
                 speedState = SpeedState.RegularSpeed;
+                rb.velocity = savedVelocity;
             }
         }
         else if (Input.GetKeyDown(KeyCode.Return))
         {
+            if (speedState == SpeedState.Paused)
+                rb.velocity = savedVelocity;
             speedState = speedState == SpeedState.HighSpeed ? SpeedState.RegularSpeed : SpeedState.HighSpeed;
         }
         else if (Input.GetKeyDown(KeyCode.R))
@@ -68,13 +77,13 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        rb.gravityScale = System.Convert.ToInt32(speedState != SpeedState.Paused);
+        rb.isKinematic = speedState == SpeedState.Paused;
 
         if (speedState == SpeedState.Paused) return;
 
         float moveSpeed = speedState == SpeedState.RegularSpeed ? regularMoveSpeed : highMoveSpeed;
 
-        transform.Translate(Vector2.right * moveSpeed * Time.deltaTime);
+        rb.velocity = new Vector2(moveSpeed, rb.velocity.y);
 
         scaleSlider.value = transform.localScale.y;
     }
@@ -82,6 +91,14 @@ public class PlayerMovement : MonoBehaviour
     public void SelectSpeedState(int stateID)
     {
         speedState = (SpeedState)stateID;
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Jump Pad") && speedState != SpeedState.Paused)
+        {
+            rb.velocity = Vector2.up * jumpForce;
+        }
     }
 
     private IEnumerator ScaleCharacter(bool positiveYScale)
