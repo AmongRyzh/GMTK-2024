@@ -610,6 +610,7 @@ MonoBehaviour:
   highMoveSpeed: 25
   scaleDiff: 0.3
   scaleDuration: 0.2
+  gravityDiff: 0.1
   scaleSlider: {fileID: 1232826369}
   jumpForce: 16
 --- !u!212 &380077867

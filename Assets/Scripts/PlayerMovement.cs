@@ -20,7 +20,7 @@ public class PlayerMovement : MonoBehaviour
 
     private bool canBeScaled = true;
 
-    [SerializeField] private float scaleDiff, scaleDuration;
+    [SerializeField] private float scaleDiff, scaleDuration/*, gravityDiff*/;
 
     [SerializeField] private Slider scaleSlider;
 
@@ -91,6 +91,21 @@ public class PlayerMovement : MonoBehaviour
     public void SelectSpeedState(int stateID)
     {
         speedState = (SpeedState)stateID;
+        switch (stateID)
+        {
+            case 0:
+                savedVelocity = rb.velocity;
+                rb.velocity = Vector2.zero;
+                break;
+            case 1:
+                break;
+                rb.velocity = savedVelocity;
+            case 2:
+                break;
+                rb.velocity = savedVelocity;
+            default:
+                break;
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -119,14 +134,17 @@ public class PlayerMovement : MonoBehaviour
         Vector2 newPositiveYScale = new Vector2(transform.localScale.x - scaleDiff, transform.localScale.y + scaleDiff);
         Vector2 newNegativeYScale = new Vector2(transform.localScale.x + scaleDiff, transform.localScale.y - scaleDiff);
 
+        //float newGravityScale = positiveYScale == true ? rb.gravityScale - gravityDiff : rb.gravityScale + gravityDiff;
+
         Vector2 newPlayerScale = positiveYScale == true ? newPositiveYScale : newNegativeYScale;
 
-        if (newPlayerScale.y > 3.8f || newPlayerScale.y < 0.2f)
+        if ((newPlayerScale.y > 3.8f || newPlayerScale.y < 0.2f)/* && (newGravityScale > 1.6f || newGravityScale < 0.4f)*/)
         {
             canBeScaled = true;
             yield break;
         }
 
+        //DOTween.To(() => rb.gravityScale, x => rb.gravityScale = x, newGravityScale, 0.2f);
 
         if (newPlayerScale.y < transform.localScale.y)
             transform.DOMoveY(transform.position.y - scaleDiff, scaleDuration);
