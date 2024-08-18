@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Jump Pad
   - Player Rotator
+  - GameFinish
   layers:
   - Default
   - TransparentFX

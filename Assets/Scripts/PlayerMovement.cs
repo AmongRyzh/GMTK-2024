@@ -35,6 +35,8 @@ public class PlayerMovement : MonoBehaviour
     Vector2 savedVelocity;
     Tween currentTween;
 
+    bool canChangeSpeed = true;
+
     /*bool isGrounded;
     [SerializeField] Transform feetPos;
     [SerializeField] float checkRadius;
@@ -53,9 +55,9 @@ public class PlayerMovement : MonoBehaviour
     {
         //isGrounded = Physics2D.OverlapCircle(feetPos.position, checkRadius, whatIsGround);
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && canChangeSpeed)
         {
-            if (speedState == SpeedState.RegularSpeed || speedState == SpeedState.HighSpeed)
+            if (speedState == SpeedState.RegularSpeed/* || speedState == SpeedState.HighSpeed*/)
             {
                 speedState = SpeedState.Paused;
                 savedVelocity = rb.velocity;
@@ -67,12 +69,12 @@ public class PlayerMovement : MonoBehaviour
                 rb.velocity = savedVelocity;
             }
         }
-        else if (Input.GetKeyDown(KeyCode.Return))
+        /*else if (Input.GetKeyDown(KeyCode.Return))
         {
             if (speedState == SpeedState.Paused)
                 rb.velocity = savedVelocity;
             speedState = speedState == SpeedState.HighSpeed ? SpeedState.RegularSpeed : SpeedState.HighSpeed;
-        }
+        }*/
         else if (Input.GetKeyDown(KeyCode.R))
         {
             RestartLevel();
@@ -132,6 +134,14 @@ public class PlayerMovement : MonoBehaviour
         if (other.CompareTag("Finish"))
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        }
+        else if (other.CompareTag("GameFinish"))
+        {
+            other.GetComponent<AudioSource>().Play();
+            speedState = SpeedState.Paused;
+            canChangeSpeed = false;
+            yield return new WaitForSeconds(other.GetComponent<AudioSource>().clip.length);
+            SceneManager.LoadScene(0);
         }
         yield return new WaitUntil(() => speedState != SpeedState.Paused);
         if (other.CompareTag("Jump Pad")/* && speedState != SpeedState.Paused*/)
