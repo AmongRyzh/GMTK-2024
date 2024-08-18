@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using DG.Tweening;
+using TMPro;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -23,8 +24,12 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float scaleDiff, scaleDuration/*, gravityDiff*/;
 
     [SerializeField] private Slider scaleSlider;
+    private TMP_Text scaleText;
 
     [SerializeField] private float jumpForce;
+
+    [SerializeField] private Transform deathCheck;
+    [SerializeField] private LayerMask deathLayer;
 
     Vector2 savedVelocity;
 
@@ -37,6 +42,7 @@ public class PlayerMovement : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         scaleSlider = FindObjectOfType<Slider>();
+        scaleText = scaleSlider.transform.Find("Handle Slide Area").Find("Handle").GetComponentInChildren<TMP_Text>();
 
         speedState = SpeedState.RegularSpeed;
     }
@@ -72,11 +78,11 @@ public class PlayerMovement : MonoBehaviour
 
         if (canBeScaled)
         {
-            if (Input.GetKeyDown(KeyCode.W))
+            if (Input.GetKey(KeyCode.W))
             {
                 StartCoroutine(ScaleCharacter(true));
             }
-            else if (Input.GetKeyDown(KeyCode.S))
+            else if (Input.GetKey(KeyCode.S))
             {
                 StartCoroutine(ScaleCharacter(false));
             }
@@ -85,6 +91,9 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        scaleSlider.value = transform.localScale.y;
+        scaleText.text = $"{scaleSlider.value}";
+
         rb.isKinematic = speedState == SpeedState.Paused;
 
         if (speedState == SpeedState.Paused) return;
@@ -92,8 +101,6 @@ public class PlayerMovement : MonoBehaviour
         float moveSpeed = speedState == SpeedState.RegularSpeed ? regularMoveSpeed : highMoveSpeed;
 
         rb.velocity = new Vector2(moveSpeed * (transform.localScale.x / 2), rb.velocity.y);
-
-        scaleSlider.value = transform.localScale.y;
     }
 
     public void SelectSpeedState(int stateID)
@@ -116,15 +123,34 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    private IEnumerator OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Jump Pad") && speedState != SpeedState.Paused)
+        if (other.CompareTag("Finish"))
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        }
+        yield return new WaitUntil(() => speedState != SpeedState.Paused);
+        if (other.CompareTag("Jump Pad")/* && speedState != SpeedState.Paused*/)
         {
             rb.velocity = Vector2.up * jumpForce;
         }
-        else if (other.CompareTag("Player Rotator") && speedState != SpeedState.Paused)
+        else if (other.CompareTag("Player Rotator")/* && speedState != SpeedState.Paused*/)
         {
-            transform.localScale = other.transform.localScale;
+            transform.localScale = new Vector2(-transform.localScale.x, transform.localScale.y);
+        }
+    }
+
+    bool IsCollidingRespawn()
+    {
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(deathCheck.position, new Vector2(.1f, 3.8f), 0, deathLayer);
+        return colliders.Length > 0;
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (IsCollidingRespawn())
+        {
+            RestartLevel();
         }
     }
 
@@ -143,8 +169,19 @@ public class PlayerMovement : MonoBehaviour
 
         canBeScaled = false;
 
-        Vector2 newPositiveYScale = new Vector2(transform.localScale.x - scaleDiff, transform.localScale.y + scaleDiff);
-        Vector2 newNegativeYScale = new Vector2(transform.localScale.x + scaleDiff, transform.localScale.y - scaleDiff);
+        Vector2 newPositiveYScale;
+        Vector2 newNegativeYScale;
+
+        if (transform.localScale.x > 0)
+        {
+            newPositiveYScale = new Vector2(transform.localScale.x - scaleDiff, transform.localScale.y + scaleDiff);
+            newNegativeYScale = new Vector2(transform.localScale.x + scaleDiff, transform.localScale.y - scaleDiff);
+        }
+        else
+        {
+            newPositiveYScale = new Vector2(transform.localScale.x + scaleDiff, transform.localScale.y + scaleDiff);
+            newNegativeYScale = new Vector2(transform.localScale.x - scaleDiff, transform.localScale.y - scaleDiff);
+        }
 
         //float newGravityScale = positiveYScale == true ? rb.gravityScale - gravityDiff : rb.gravityScale + gravityDiff;
 
@@ -160,6 +197,8 @@ public class PlayerMovement : MonoBehaviour
 
         if (newPlayerScale.y < transform.localScale.y)
             transform.DOMoveY(transform.position.y - scaleDiff, scaleDuration);
+        else
+            transform.DOMoveY(transform.position.y + scaleDiff, scaleDuration);
         transform.DOScale(newPlayerScale, scaleDuration);
         yield return new WaitForSeconds(scaleDuration);
 
@@ -192,5 +231,11 @@ public class PlayerMovement : MonoBehaviour
     public void RestartLevel()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(deathCheck.position, new Vector2(.1f, 3.8f));
     }
 }
