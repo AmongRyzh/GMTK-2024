@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: PlayerRotator
   m_EditorClassIdentifier: 
   objectName: Player Rotator
-  slotImage: {fileID: 1384783000, guid: c814b176bbf345340bf71a2bf3cd7eed, type: 3}
+  slotImage: {fileID: -95258832, guid: 1fe5e6a3f508ae4409ff256551a396b3, type: 3}
   objectPrefab: {fileID: 7346797640161666976, guid: b95af11e04e023b4a9c792b45f5feb60, type: 3}

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7346797640161666976}
   - component: {fileID: 5128369565682262850}
   - component: {fileID: 6613875133499328862}
+  - component: {fileID: 1068989249}
   m_Layer: 0
   m_Name: PlayerRotator
   m_TagString: Player Rotator
@@ -138,3 +139,24 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.697155, y: 0.8762665}
   m_EdgeRadius: 0
+--- !u!95 &1068989249
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5306213958127994460}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: cb1401782d2428d4081a894c28646747, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

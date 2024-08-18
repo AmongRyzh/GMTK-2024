@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: JumpPad
   m_EditorClassIdentifier: 
   objectName: Jump Pad
-  slotImage: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  slotImage: {fileID: 1361409555, guid: 9c1c4fa538285c640a1b5b8931301473, type: 3}
   objectPrefab: {fileID: 4636660862781616430, guid: 2f596aec2846cf4489a479cbdfe915fd, type: 3}

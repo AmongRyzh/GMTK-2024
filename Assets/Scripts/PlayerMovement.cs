@@ -132,23 +132,25 @@ public class PlayerMovement : MonoBehaviour
         yield return new WaitUntil(() => speedState != SpeedState.Paused);
         if (other.CompareTag("Jump Pad")/* && speedState != SpeedState.Paused*/)
         {
+            other.GetComponent<Animator>().SetTrigger("JumpPad");
             rb.velocity = Vector2.up * jumpForce;
         }
         else if (other.CompareTag("Player Rotator")/* && speedState != SpeedState.Paused*/)
         {
+            other.GetComponent<Animator>().SetTrigger("PlayerRotator");
             transform.localScale = new Vector2(-transform.localScale.x, transform.localScale.y);
         }
     }
 
     bool IsCollidingRespawn()
     {
-        Collider2D[] colliders = Physics2D.OverlapBoxAll(deathCheck.position, new Vector2(.1f, 3.8f), 0, deathLayer);
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(deathCheck.position, new Vector2(.1f, 3.8f * (transform.localScale.y / 2)), 0, deathLayer);
         return colliders.Length > 0;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (IsCollidingRespawn())
+        if (IsCollidingRespawn() || collision.collider.CompareTag("Respawn"))
         {
             RestartLevel();
         }
@@ -236,6 +238,6 @@ public class PlayerMovement : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(deathCheck.position, new Vector2(.1f, 3.8f));
+        Gizmos.DrawWireCube(deathCheck.position, new Vector2(.1f, 3.8f * (transform.localScale.y / 2)));
     }
 }
