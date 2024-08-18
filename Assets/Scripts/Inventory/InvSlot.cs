@@ -8,6 +8,12 @@ public class InvSlot : MonoBehaviour
     public InvSO currentObject;
     [SerializeField] private Image slotImage;
     [SerializeField] private TMP_Text objectNameText;
+    InvObjectHandler objectHandler;
+
+    private void Start()
+    {
+        objectHandler = FindObjectOfType<InvObjectHandler>();
+    }
 
     public void UpdateSlotData()
     {
@@ -21,7 +27,7 @@ public class InvSlot : MonoBehaviour
         if (currentObject != null)
         {
             print("2.1");
-            StartCoroutine(FindObjectOfType<InvObjectHandler>().SpawnObject(currentObject));
+            StartCoroutine(objectHandler.SpawnObject(currentObject));
         }
     }
 }

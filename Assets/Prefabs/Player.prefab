@@ -110,6 +110,7 @@ MonoBehaviour:
   deathLayer:
     serializedVersion: 2
     m_Bits: 8
+  deathCheckHeight: 1.89
 --- !u!50 &2458753452819802323
 Rigidbody2D:
   serializedVersion: 4

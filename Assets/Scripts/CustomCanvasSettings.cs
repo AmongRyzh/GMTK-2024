@@ -4,13 +4,20 @@ using UnityEngine;
 
 public class CustomCanvasSettings : MonoBehaviour
 {
+    PlayerMovement player;
+
+    private void Start()
+    {
+        player = FindObjectOfType<PlayerMovement>();
+    }
+
     public void SetSpeedState(int stateID)
     {
-        FindObjectOfType<PlayerMovement>().SelectSpeedState(stateID);
+        player.SelectSpeedState(stateID);
     }
 
     public void RestartLevel()
     {
-        FindObjectOfType<PlayerMovement>().RestartLevel();
+        player.RestartLevel();
     }
 }
