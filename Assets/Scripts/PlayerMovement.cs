@@ -21,6 +21,8 @@ public class PlayerMovement : MonoBehaviour
 
     private bool canBeScaled = true;
 
+    [SerializeField] private Transform scaleUpPossibilityCheck;
+    [SerializeField] private float scaleUpCheckWidth;
     [SerializeField] private float scaleDiff, scaleDuration/*, gravityDiff*/;
 
     [SerializeField] private Slider scaleSlider;
@@ -79,6 +81,14 @@ public class PlayerMovement : MonoBehaviour
         {
             RestartLevel();
         }
+    }
+
+    private void FixedUpdate()
+    {
+        scaleSlider.value = transform.localScale.y;
+        scaleText.text = $"{scaleSlider.value}";
+
+        rb.isKinematic = speedState == SpeedState.Paused;
 
         if (canBeScaled)
         {
@@ -93,14 +103,6 @@ public class PlayerMovement : MonoBehaviour
                 ScaleCharacter(false);
             }
         }
-    }
-
-    private void FixedUpdate()
-    {
-        scaleSlider.value = transform.localScale.y;
-        scaleText.text = $"{scaleSlider.value}";
-
-        rb.isKinematic = speedState == SpeedState.Paused;
 
         if (speedState == SpeedState.Paused) return;
 
@@ -161,13 +163,30 @@ public class PlayerMovement : MonoBehaviour
     bool IsCollidingRespawn()
     {
         Collider2D[] colliders = Physics2D.OverlapBoxAll(deathCheck.position, new Vector2(.1f, deathCheckHeight * (transform.localScale.y)), 0, deathLayer);
+        print("IsCollidingRespawn() = " + (colliders.Length > 0));
         return colliders.Length > 0;
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    bool CanScaleUp()
     {
-        if (IsCollidingRespawn() || collision.collider.CompareTag("Respawn"))
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(scaleUpPossibilityCheck.position, new Vector2(scaleUpCheckWidth * transform.localScale.x, .1f), 0, deathLayer);
+        print("CanScaleUp() = " + (colliders.Length == 0));
+        return colliders.Length == 0;
+    }
+
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        rb.isKinematic = true;
+        rb.isKinematic = false;
+        if (collision.collider.CompareTag("Antikostyl"))
         {
+            print("5.0.1");
+            return;
+        }
+
+        if (IsCollidingRespawn() || collision.collider.CompareTag("Kostyl"))
+        {
+            print("5.0.2");
             RestartLevel();
         }
     }
@@ -272,6 +291,8 @@ public class PlayerMovement : MonoBehaviour
 
     public void ScaleCharacter(bool increaseYAxis)
     {
+        if (!CanScaleUp()) return;
+
         if (transform.localScale.y < 0.2f)
         {
             transform.localScale = new Vector2(3.8f, 0.2f);
@@ -288,16 +309,16 @@ public class PlayerMovement : MonoBehaviour
 
         if (transform.localScale.x > 0)
         {
-            newPositiveYScale = new Vector2(transform.localScale.x - 0.01f, transform.localScale.y + 0.01f);
-            newNegativeYScale = new Vector2(transform.localScale.x + 0.01f, transform.localScale.y - 0.01f);
+            newPositiveYScale = new Vector2(transform.localScale.x - 0.04f, transform.localScale.y + 0.04f);
+            newNegativeYScale = new Vector2(transform.localScale.x + 0.04f, transform.localScale.y - 0.04f);
         }
         else
         {
-            newPositiveYScale = new Vector2(transform.localScale.x + 0.01f, transform.localScale.y + 0.01f);
-            newNegativeYScale = new Vector2(transform.localScale.x - 0.01f, transform.localScale.y - 0.01f);
+            newPositiveYScale = new Vector2(transform.localScale.x + 0.04f, transform.localScale.y + 0.04f);
+            newNegativeYScale = new Vector2(transform.localScale.x - 0.04f, transform.localScale.y - 0.04f);
         }
 
-        float newGravityScale = increaseYAxis == true ? rb.gravityScale - 0.006f : rb.gravityScale + 0.006f;
+        float newGravityScale = increaseYAxis == true ? rb.gravityScale - 0.024f : rb.gravityScale + 0.024f;
 
         Vector2 newPlayerScale = increaseYAxis == true ? newPositiveYScale : newNegativeYScale;
 
@@ -310,9 +331,9 @@ public class PlayerMovement : MonoBehaviour
         //rb.gravityScale = newGravityScale;
 
         if (newPlayerScale.y < transform.localScale.y)
-            transform.position = new Vector2(transform.position.x, transform.position.y - 0.01f);
+            transform.position = new Vector2(transform.position.x, transform.position.y - 0.04f);
         else
-            transform.position = new Vector2(transform.position.x, transform.position.y + 0.01f);
+            transform.position = new Vector2(transform.position.x, transform.position.y + 0.04f);
 
         transform.localScale = newPlayerScale;
     }
@@ -326,5 +347,7 @@ public class PlayerMovement : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(deathCheck.position, new Vector2(.1f, deathCheckHeight * (transform.localScale.y)));
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireCube(scaleUpPossibilityCheck.position, new Vector2(scaleUpCheckWidth * transform.localScale.x, .1f));
     }
 }
