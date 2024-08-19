@@ -58,6 +58,10 @@ public class InvObjectHandler : MonoBehaviour
             canPickup = false;
             yield return new WaitUntil(() => !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.C));
         }
+        else if (Input.GetMouseButtonDown(1))
+        {
+            StartCoroutine(SpawnObject(invSlot.currentObject));
+        }
     }
 
     public IEnumerator SpawnObject(InvSO invSO)

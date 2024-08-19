@@ -37,7 +37,7 @@ public class PlayerMovement : MonoBehaviour
     Vector2 savedVelocity;
     Tween currentTween;
 
-    bool canChangeSpeed = true;
+    [HideInInspector] public bool canChangeSpeed = true;
 
     [SerializeField] private GameObject screenOff;
 
@@ -122,7 +122,7 @@ public class PlayerMovement : MonoBehaviour
         rb.velocity = new Vector2(moveSpeed * (transform.localScale.x / 2), rb.velocity.y);
     }
 
-    /*public void SelectSpeedState(int stateID)
+    public void SelectSpeedState(int stateID)
     {
         speedState = (SpeedState)stateID;
         switch (stateID)
@@ -130,17 +130,20 @@ public class PlayerMovement : MonoBehaviour
             case 0:
                 savedVelocity = rb.velocity;
                 rb.velocity = Vector2.zero;
+                canChangeSpeed = false;
                 break;
             case 1:
-                break;
                 rb.velocity = savedVelocity;
+                canChangeSpeed = false;
+                break;
             case 2:
-                break;
                 rb.velocity = savedVelocity;
+                canChangeSpeed = false;
+                break;
             default:
                 break;
         }
-    }*/
+    }
 
     public void SwitchPlayPause()
     {
@@ -175,17 +178,20 @@ public class PlayerMovement : MonoBehaviour
             SceneManager.LoadScene(0);
         }
         yield return new WaitUntil(() => speedState != SpeedState.Paused);
-        if (other.CompareTag("Jump Pad")/* && speedState != SpeedState.Paused*/)
+        if (other != null)
         {
-            other.GetComponent<Animator>().SetTrigger("JumpPad");
-            rb.velocity = Vector2.up * jumpForce;
-        }
-        else if (other.CompareTag("Player Rotator")/* && speedState != SpeedState.Paused*/)
-        {
-            other.GetComponent<Animator>().SetTrigger("PlayerRotator");
-            DOTween.PauseAll();
-            transform.localScale = new Vector2(-transform.localScale.x, transform.localScale.y);
-            DOTween.PlayAll();
+            if (other.CompareTag("Jump Pad")/* && speedState != SpeedState.Paused*/)
+            {
+                other.GetComponent<Animator>().SetTrigger("JumpPad");
+                rb.velocity = Vector2.up * jumpForce;
+            }
+            else if (other.CompareTag("Player Rotator")/* && speedState != SpeedState.Paused*/)
+            {
+                other.GetComponent<Animator>().SetTrigger("PlayerRotator");
+                DOTween.PauseAll();
+                transform.localScale = new Vector2(-transform.localScale.x, transform.localScale.y);
+                DOTween.PlayAll();
+            }
         }
     }
 

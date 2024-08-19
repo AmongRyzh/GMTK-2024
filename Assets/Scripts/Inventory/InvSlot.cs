@@ -21,13 +21,13 @@ public class InvSlot : MonoBehaviour
         objectNameText.text = currentObject.objectName;
     }
 
-    public void SpawnObject()
+    /*public void SpawnObject()
     {
         print("2");
-        if (currentObject != null)
+        if (currentObject != null && !objectHandler.isSpawning)
         {
             print("2.1");
-            StartCoroutine(objectHandler.SpawnObject(currentObject));
+            StartCoroutine(objectHandler.SpawnObject(currentObject, false));
         }
-    }
+    }*/
 }
