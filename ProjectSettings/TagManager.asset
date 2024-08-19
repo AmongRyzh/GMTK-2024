@@ -9,6 +9,7 @@ TagManager:
   - GameFinish
   - Kostyl
   - Antikostyl
+  - Ground
   layers:
   - Default
   - TransparentFX

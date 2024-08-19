@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class InvObjectHandler : MonoBehaviour
@@ -6,14 +7,22 @@ public class InvObjectHandler : MonoBehaviour
     private InvSlot invSlot;
     private SpriteRenderer spriteRenderer;
     private bool canPickup = true;
+    //private InvObjectCounter objectCounter;
 
     [SerializeField] private float checkRadius;
+
+    public List<InvObject> objects;
+    [SerializeField] private int maxObjectCount;
+
+    [SerializeField] private LayerMask tilemapLayer;
+    bool isCollidingWithTilemap;
 
     // Start is called before the first frame update
     void Start()
     {
         invSlot = FindObjectOfType<InvSlot>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        //objectCounter = FindObjectOfType<InvObjectCounter>();
     }
 
     private void Update()
@@ -67,12 +76,46 @@ public class InvObjectHandler : MonoBehaviour
         }
         else if (Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.V))
         {
-            print("2.4.2.1");
-            InvObject spawnedObject = Instantiate(invSO.objectPrefab, transform.position, Quaternion.identity);
-            print($"2.4.2.2 ({spawnedObject})");
-            spriteRenderer.sprite = null;
-            yield return new WaitUntil(() => !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.V));
-            canPickup = true;
+            if (!isCollidingWithTilemap)
+            {
+                print("2.4.2.1.1");
+                if (objects.Count >= maxObjectCount)
+                {
+                    InvObject deletedObject = objects[0];
+                    objects.RemoveAt(0);
+                    Destroy(deletedObject.gameObject);
+                }
+
+                InvObject spawnedObject = Instantiate(invSO.objectPrefab, transform.position, Quaternion.identity/*, objectCounter.transform*/);
+                objects.Add(spawnedObject);
+                print($"2.4.2.1.2 ({spawnedObject})");
+                spriteRenderer.sprite = null;
+                yield return new WaitUntil(() => !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.V));
+                canPickup = true;
+            }
+            else
+            {
+                print("2.4.2.2");
+                spriteRenderer.sprite = null;
+                yield return new WaitUntil(() => !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.V));
+                canPickup = true;
+            }
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Ground"))
+        {
+            isCollidingWithTilemap = true;
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.CompareTag("Ground"))
+        {
+            isCollidingWithTilemap = false;
         }
     }
 

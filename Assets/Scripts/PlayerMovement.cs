@@ -11,13 +11,13 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float regularMoveSpeed, highMoveSpeed;
     private Rigidbody2D rb;
 
-    private enum SpeedState
+    public enum SpeedState
     {
         Paused = 0,
         RegularSpeed = 1,
         HighSpeed = 2
     }
-    private SpeedState speedState;
+    public SpeedState speedState { get; private set; }
 
     private bool canBeScaled = true;
 
@@ -39,6 +39,8 @@ public class PlayerMovement : MonoBehaviour
 
     bool canChangeSpeed = true;
 
+    [SerializeField] private GameObject screenOff;
+
     /*bool isGrounded;
     [SerializeField] Transform feetPos;
     [SerializeField] float checkRadius;
@@ -49,6 +51,7 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         scaleSlider = FindObjectOfType<Slider>();
         scaleText = scaleSlider.transform.Find("Handle Slide Area").Find("Handle").GetComponentInChildren<TMP_Text>();
+        scaleText.maxVisibleCharacters = 4;
 
         speedState = SpeedState.RegularSpeed;
     }
@@ -59,6 +62,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space) && canChangeSpeed)
         {
+            FindObjectOfType<CustomCanvasSettings>().UpdatePlayPauseButtonImage();
             if (speedState == SpeedState.RegularSpeed/* || speedState == SpeedState.HighSpeed*/)
             {
                 speedState = SpeedState.Paused;
@@ -111,7 +115,7 @@ public class PlayerMovement : MonoBehaviour
         rb.velocity = new Vector2(moveSpeed * (transform.localScale.x / 2), rb.velocity.y);
     }
 
-    public void SelectSpeedState(int stateID)
+    /*public void SelectSpeedState(int stateID)
     {
         speedState = (SpeedState)stateID;
         switch (stateID)
@@ -128,6 +132,23 @@ public class PlayerMovement : MonoBehaviour
                 rb.velocity = savedVelocity;
             default:
                 break;
+        }
+    }*/
+
+    public void SwitchPlayPause()
+    {
+        FindObjectOfType<CustomCanvasSettings>().UpdatePlayPauseButtonImage();
+        screenOff.SetActive(speedState == SpeedState.Paused);
+        if (speedState == SpeedState.RegularSpeed/* || speedState == SpeedState.HighSpeed*/)
+        {
+            speedState = SpeedState.Paused;
+            savedVelocity = rb.velocity;
+            rb.velocity = Vector2.zero;
+        }
+        else
+        {
+            speedState = SpeedState.RegularSpeed;
+            rb.velocity = savedVelocity;
         }
     }
 
@@ -291,8 +312,6 @@ public class PlayerMovement : MonoBehaviour
 
     public void ScaleCharacter(bool increaseYAxis)
     {
-        if (!CanScaleUp()) return;
-
         if (transform.localScale.y < 0.2f)
         {
             transform.localScale = new Vector2(3.8f, 0.2f);
@@ -322,7 +341,7 @@ public class PlayerMovement : MonoBehaviour
 
         Vector2 newPlayerScale = increaseYAxis == true ? newPositiveYScale : newNegativeYScale;
 
-        if ((newPlayerScale.y > 3.8f || newPlayerScale.y < 0.2f)/* && (newGravityScale > 1.6f || newGravityScale < 0.4f)*/)
+        if (newPlayerScale.y > 3.8f || newPlayerScale.y < 0.2f/* && (newGravityScale > 1.6f || newGravityScale < 0.4f)*/)
         {
             canBeScaled = true;
             return;
@@ -333,7 +352,10 @@ public class PlayerMovement : MonoBehaviour
         if (newPlayerScale.y < transform.localScale.y)
             transform.position = new Vector2(transform.position.x, transform.position.y - 0.04f);
         else
+        {
+            if (!CanScaleUp()) return;
             transform.position = new Vector2(transform.position.x, transform.position.y + 0.04f);
+        }
 
         transform.localScale = newPlayerScale;
     }
