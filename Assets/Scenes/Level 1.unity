@@ -919,10 +919,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: 'LevelFinish '
       objectReference: {fileID: 0}
-    - target: {fileID: 5161253285875753785, guid: a674611f7accb184bbb5a0da0e24186e, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 989951818, guid: 68ae066e52a60404f9e5b0fbf644cc03, type: 3}
     - target: {fileID: 5161253285875753787, guid: a674611f7accb184bbb5a0da0e24186e, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -983,14 +979,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 670560247818243262, guid: 9cfdbb10500204540a35629fc97655f8, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 670560248076939416, guid: 9cfdbb10500204540a35629fc97655f8, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 38.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 670560248076939416, guid: 9cfdbb10500204540a35629fc97655f8, type: 3}
-      propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 670560249204579582, guid: 9cfdbb10500204540a35629fc97655f8, type: 3}

@@ -41,6 +41,8 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField] private GameObject screenOff;
 
+    Animator anim;
+
     /*bool isGrounded;
     [SerializeField] Transform feetPos;
     [SerializeField] float checkRadius;
@@ -52,6 +54,8 @@ public class PlayerMovement : MonoBehaviour
         scaleSlider = FindObjectOfType<Slider>();
         scaleText = scaleSlider.transform.Find("Handle Slide Area").Find("Handle").GetComponentInChildren<TMP_Text>();
         scaleText.maxVisibleCharacters = 4;
+
+        anim = GetComponent<Animator>();
 
         speedState = SpeedState.RegularSpeed;
     }
@@ -65,15 +69,18 @@ public class PlayerMovement : MonoBehaviour
             FindObjectOfType<CustomCanvasSettings>().UpdatePlayPauseButtonImage();
             if (speedState == SpeedState.RegularSpeed/* || speedState == SpeedState.HighSpeed*/)
             {
+                screenOff.SetActive(true);
                 speedState = SpeedState.Paused;
                 savedVelocity = rb.velocity;
                 rb.velocity = Vector2.zero;
             }
             else
             {
+                screenOff.SetActive(false);
                 speedState = SpeedState.RegularSpeed;
                 rb.velocity = savedVelocity;
             }
+            anim.SetBool("isPaused", speedState == SpeedState.Paused);
         }
         /*else if (Input.GetKeyDown(KeyCode.Return))
         {
@@ -138,7 +145,6 @@ public class PlayerMovement : MonoBehaviour
     public void SwitchPlayPause()
     {
         FindObjectOfType<CustomCanvasSettings>().UpdatePlayPauseButtonImage();
-        screenOff.SetActive(speedState == SpeedState.Paused);
         if (speedState == SpeedState.RegularSpeed/* || speedState == SpeedState.HighSpeed*/)
         {
             speedState = SpeedState.Paused;
@@ -150,6 +156,8 @@ public class PlayerMovement : MonoBehaviour
             speedState = SpeedState.RegularSpeed;
             rb.velocity = savedVelocity;
         }
+        anim.SetBool("isPaused", speedState == SpeedState.Paused);
+        screenOff.SetActive(speedState == SpeedState.Paused);
     }
 
     private IEnumerator OnTriggerEnter2D(Collider2D other)
