@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 13312, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: "\u043F\u0438\u0441\u044C\u043A\u0430 4"
+  m_Name: "\u043F\u0438\u0441\u044C\u043A\u0430 3"
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: 21300000, guid: a3150de31988d3042ac7d63f0f5cbe6f, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 71cafff10981d5d489730b4bac81b02b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1
