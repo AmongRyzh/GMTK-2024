@@ -4,9 +4,12 @@ using DG.Tweening;
 
 public class HydraulicPress : MonoBehaviour
 {
-    [SerializeField] GameObject press;
+    [SerializeField] GameObject press, chain;
     [SerializeField] float startPositionY;
+    
     [SerializeField] float endPositionY;
+    [SerializeField] float chainStartPositionY, chainStartScaleY;
+    [SerializeField] float chainEndPositionY, chainEndScaleY;
     bool isMovingDown;
     float timeElapsed;
 
@@ -24,8 +27,9 @@ public class HydraulicPress : MonoBehaviour
     public void StopBlockUpdate()
     {
         timeElapsed = currentTween.Elapsed();
-        DOTween.Kill(transform);
-        StopCoroutine(FindObjectOfType<HydraulicPress>().blockUpdate);
+        DOTween.Kill(press.transform);
+        DOTween.Kill(chain.transform);
+        StopCoroutine(blockUpdate);
     }
 
     public void ResumeBlockUpdate()
@@ -39,7 +43,7 @@ public class HydraulicPress : MonoBehaviour
         }
         else
         {
-            time1 = 0.2f;
+            time1 = 0f;
             time2 = 1f - timeElapsed;
         }
         blockUpdate = StartCoroutine(BlockUpdate(true, time1, time2));
@@ -50,11 +54,18 @@ public class HydraulicPress : MonoBehaviour
         if (resumed)
         {
             isMovingDown = true;
-            currentTween = press.transform.DOMoveY(endPositionY, time1);
+            if (time1 != 0)
+            {
+                currentTween = press.transform.DOLocalMoveY(endPositionY, time1);
+                chain.transform.DOLocalMoveY(chainEndPositionY, time1);
+                chain.transform.DOScaleY(chainEndScaleY, time1);
+            }
             print(7);
             yield return new WaitForSeconds(time1);
             isMovingDown = false;
-            currentTween = press.transform.DOMoveY(startPositionY, time2);
+            currentTween = press.transform.DOLocalMoveY(startPositionY, time2);
+            chain.transform.DOLocalMoveY(chainStartPositionY, time2);
+            chain.transform.DOScaleY(chainStartScaleY, time2);
             print(7.1);
             yield return new WaitForSeconds(time2);
             print(7.2);
@@ -69,21 +80,26 @@ public class HydraulicPress : MonoBehaviour
         while (true)
         {
             isMovingDown = true;
-            currentTween = press.transform.DOMoveY(endPositionY, 0.2f);
+            currentTween = press.transform.DOLocalMoveY(endPositionY, 0.2f);
+            chain.transform.DOLocalMoveY(chainEndPositionY, 0.2f);
+            chain.transform.DOScaleY(chainEndScaleY, 0.2f);
             print(7.4);
             yield return new WaitForSeconds(0.2f);
             isMovingDown = false;
-            currentTween = press.transform.DOMoveY(startPositionY, 1f);
+            currentTween = press.transform.DOLocalMoveY(startPositionY, 1f);
+            chain.transform.DOLocalMoveY(chainStartPositionY, 1f);
+            chain.transform.DOScaleY(chainStartScaleY, 1f);
             print(7.5);
             yield return new WaitForSeconds(1f);
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    public void MetalBlockCollision()
     {
-        if (collision.collider.CompareTag("MetalBlock") && isMovingDown)
+        if (isMovingDown)
         {
-            DOTween.Kill(transform);
+            DOTween.Kill(press.transform);
+            DOTween.Kill(chain.transform);
         }
     }
 }

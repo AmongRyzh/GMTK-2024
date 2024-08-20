@@ -74,9 +74,9 @@ public class PlayerMovement : MonoBehaviour
             if (speedState == SpeedState.RegularSpeed/* || speedState == SpeedState.HighSpeed*/)
             {
                 screenOff.SetActive(true); 
-                foreach (var obj in FindObjectsOfType<HydraulicPress>())
+                foreach (HydraulicPress press in FindObjectsByType<HydraulicPress>(FindObjectsSortMode.None))
                 {
-                    obj.StopBlockUpdate();
+                    press.StopBlockUpdate();
                 }
                 speedState = SpeedState.Paused;
                 savedVelocity = rb.velocity;
@@ -84,9 +84,9 @@ public class PlayerMovement : MonoBehaviour
             }
             else
             {
-                foreach (var obj in FindObjectsOfType<HydraulicPress>())
+                foreach (HydraulicPress press in FindObjectsByType<HydraulicPress>(FindObjectsSortMode.None))
                 {
-                    obj.ResumeBlockUpdate();
+                    press.ResumeBlockUpdate();
                 }
                 screenOff.SetActive(false);
                 speedState = SpeedState.RegularSpeed;
@@ -145,18 +145,18 @@ public class PlayerMovement : MonoBehaviour
         switch (stateID)
         {
             case 0:
-                foreach (var obj in FindObjectsOfType<HydraulicPress>())
+                foreach (HydraulicPress press in FindObjectsByType<HydraulicPress>(FindObjectsSortMode.None))
                 {
-                    obj.StopBlockUpdate();
+                    press.StopBlockUpdate();
                 }
                 savedVelocity = rb.velocity;
                 rb.velocity = Vector2.zero;
                 canChangeSpeed = false;
                 break;
             case 1:
-                foreach (var obj in FindObjectsOfType<HydraulicPress>())
+                foreach (HydraulicPress press in FindObjectsByType<HydraulicPress>(FindObjectsSortMode.None))
                 {
-                    obj.ResumeBlockUpdate();
+                    press.ResumeBlockUpdate();
                 }
                 rb.velocity = savedVelocity;
                 canChangeSpeed = false;
@@ -175,9 +175,9 @@ public class PlayerMovement : MonoBehaviour
         FindObjectOfType<CustomCanvasSettings>().UpdatePlayPauseButtonImage();
         if (speedState == SpeedState.RegularSpeed/* || speedState == SpeedState.HighSpeed*/)
         {
-            foreach (var obj in FindObjectsOfType<HydraulicPress>())
+            foreach (HydraulicPress press in FindObjectsByType<HydraulicPress>(FindObjectsSortMode.None))
             {
-                obj.StopBlockUpdate();
+                press.StopBlockUpdate();
             }
             speedState = SpeedState.Paused;
             savedVelocity = rb.velocity;
@@ -185,10 +185,10 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            foreach (var obj in FindObjectsOfType<HydraulicPress>())
-                {
-                    obj.ResumeBlockUpdate();
-                }
+            foreach (HydraulicPress press in FindObjectsByType<HydraulicPress>(FindObjectsSortMode.None))
+            {
+                press.ResumeBlockUpdate();
+            }
             speedState = SpeedState.RegularSpeed;
             rb.velocity = savedVelocity;
         }
@@ -198,11 +198,7 @@ public class PlayerMovement : MonoBehaviour
 
     private IEnumerator OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("NoScaleChangeZone"))
-        {
-            isCollidingNoScaleChangeZone = true;
-        }
-        else if (other.CompareTag("DisableNoSpawnZoneBtn"))
+        if (other.CompareTag("DisableNoSpawnZoneBtn"))
         {
             foreach (var obj in GameObject.FindGameObjectsWithTag("NoSpawnZone"))
             {
@@ -224,7 +220,11 @@ public class PlayerMovement : MonoBehaviour
         yield return new WaitUntil(() => speedState != SpeedState.Paused);
         if (other != null)
         {
-            if (other.CompareTag("Jump Pad")/* && speedState != SpeedState.Paused*/)
+            if (other.CompareTag("NoScaleChangeZone"))
+            {
+                isCollidingNoScaleChangeZone = true;
+            }
+            else if (other.CompareTag("Jump Pad")/* && speedState != SpeedState.Paused*/)
             {
                 other.GetComponent<Animator>().SetTrigger("JumpPad");
                 rb.velocity = Vector2.up * jumpForce;

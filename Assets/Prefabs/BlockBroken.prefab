@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8417678205097690736}
   - component: {fileID: 1767780110}
   - component: {fileID: 1767780107}
-  m_Layer: 3
+  m_Layer: 0
   m_Name: BlockBroken
   m_TagString: Ground
   m_Icon: {fileID: 0}
