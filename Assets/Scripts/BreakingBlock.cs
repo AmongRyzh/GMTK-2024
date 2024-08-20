@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class BreakingBlock : MonoBehaviour
@@ -10,13 +8,12 @@ public class BreakingBlock : MonoBehaviour
     {
         if (collision.collider.CompareTag("Player"))
         {
-            StartCoroutine(Breaking());
+            Invoke("Breaking", timeBreak);
         }
     }
 
-    private IEnumerator Breaking()
+    private void Breaking()
     {
-        yield return new WaitForSeconds(timeBreak);
         Destroy(gameObject);
     }
 }

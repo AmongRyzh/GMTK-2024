@@ -50,15 +50,16 @@ public class InvObjectHandler : MonoBehaviour
                 if (obj.TryGetComponent<InvObject>(out InvObject invObject228))
                 {
                     print($"1.3 ({invObject228})");
-                    invObject = invObject228.gameObject; 
+                    invObject = invObject228.gameObject;
                     invSlot.currentObject = invObject.GetComponent<InvObject>().scriptableObject;
                     invSlot.UpdateSlotData();
                 }
             }
             canPickup = false;
             yield return new WaitUntil(() => !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.C));
+            canPickup = true;
         }
-        else if (Input.GetMouseButtonDown(1))
+        else if (Input.GetMouseButtonDown(1) && invSlot.currentObject != null)
         {
             StartCoroutine(SpawnObject(invSlot.currentObject));
         }
@@ -109,7 +110,7 @@ public class InvObjectHandler : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Ground"))
+        if (other.CompareTag("Ground") || other.CompareTag("NoSpawnZone"))
         {
             isCollidingWithTilemap = true;
         }
@@ -117,7 +118,7 @@ public class InvObjectHandler : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (other.CompareTag("Ground"))
+        if (other.CompareTag("Ground") || other.CompareTag("NoSpawnZone"))
         {
             isCollidingWithTilemap = false;
         }

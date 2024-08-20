@@ -10,6 +10,10 @@ TagManager:
   - Kostyl
   - Antikostyl
   - Ground
+  - NoSpawnZone
+  - NoScaleChangeZone
+  - DisableNoSpawnZoneBtn
+  - MetalBlock
   layers:
   - Default
   - TransparentFX
@@ -17,8 +21,8 @@ TagManager:
   - Ground
   - Water
   - UI
-  - 
-  - 
+  - NoSpawnZone
+  - HydraulicPress
   - 
   - 
   - 

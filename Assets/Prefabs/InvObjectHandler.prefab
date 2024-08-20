@@ -52,7 +52,7 @@ MonoBehaviour:
   maxObjectCount: 2
   tilemapLayer:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 200
 --- !u!212 &5550674629227760181
 SpriteRenderer:
   m_ObjectHideFlags: 0

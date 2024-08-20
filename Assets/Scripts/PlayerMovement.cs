@@ -22,7 +22,8 @@ public class PlayerMovement : MonoBehaviour
     private bool canBeScaled = true;
 
     [SerializeField] private Transform scaleUpPossibilityCheck;
-    [SerializeField] private float scaleUpCheckWidth;
+    [SerializeField] private Transform scaleDownPossibilityCheck;
+    [SerializeField] private float scaleCheckWidth;
     [SerializeField] private float scaleDiff, scaleDuration/*, gravityDiff*/;
 
     [SerializeField] private Slider scaleSlider;
@@ -31,13 +32,16 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float jumpForce;
 
     [SerializeField] private Transform deathCheck;
-    [SerializeField] private LayerMask deathLayer;
+    [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private LayerMask hydraulicPressLayer;
     [SerializeField] private float deathCheckHeight;
 
     Vector2 savedVelocity;
     Tween currentTween;
 
     [HideInInspector] public bool canChangeSpeed = true;
+
+    private bool isCollidingNoScaleChangeZone;
 
     [SerializeField] private GameObject screenOff;
 
@@ -69,13 +73,21 @@ public class PlayerMovement : MonoBehaviour
             FindObjectOfType<CustomCanvasSettings>().UpdatePlayPauseButtonImage();
             if (speedState == SpeedState.RegularSpeed/* || speedState == SpeedState.HighSpeed*/)
             {
-                screenOff.SetActive(true);
+                screenOff.SetActive(true); 
+                foreach (var obj in FindObjectsOfType<HydraulicPress>())
+                {
+                    obj.StopBlockUpdate();
+                }
                 speedState = SpeedState.Paused;
                 savedVelocity = rb.velocity;
                 rb.velocity = Vector2.zero;
             }
             else
             {
+                foreach (var obj in FindObjectsOfType<HydraulicPress>())
+                {
+                    obj.ResumeBlockUpdate();
+                }
                 screenOff.SetActive(false);
                 speedState = SpeedState.RegularSpeed;
                 rb.velocity = savedVelocity;
@@ -115,6 +127,11 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
+        if (IsCollidingHydraulicPress())
+        {
+            RestartLevel();
+        }
+
         if (speedState == SpeedState.Paused) return;
 
         float moveSpeed = speedState == SpeedState.RegularSpeed ? regularMoveSpeed : highMoveSpeed;
@@ -128,11 +145,19 @@ public class PlayerMovement : MonoBehaviour
         switch (stateID)
         {
             case 0:
+                foreach (var obj in FindObjectsOfType<HydraulicPress>())
+                {
+                    obj.StopBlockUpdate();
+                }
                 savedVelocity = rb.velocity;
                 rb.velocity = Vector2.zero;
                 canChangeSpeed = false;
                 break;
             case 1:
+                foreach (var obj in FindObjectsOfType<HydraulicPress>())
+                {
+                    obj.ResumeBlockUpdate();
+                }
                 rb.velocity = savedVelocity;
                 canChangeSpeed = false;
                 break;
@@ -150,12 +175,20 @@ public class PlayerMovement : MonoBehaviour
         FindObjectOfType<CustomCanvasSettings>().UpdatePlayPauseButtonImage();
         if (speedState == SpeedState.RegularSpeed/* || speedState == SpeedState.HighSpeed*/)
         {
+            foreach (var obj in FindObjectsOfType<HydraulicPress>())
+            {
+                obj.StopBlockUpdate();
+            }
             speedState = SpeedState.Paused;
             savedVelocity = rb.velocity;
             rb.velocity = Vector2.zero;
         }
         else
         {
+            foreach (var obj in FindObjectsOfType<HydraulicPress>())
+                {
+                    obj.ResumeBlockUpdate();
+                }
             speedState = SpeedState.RegularSpeed;
             rb.velocity = savedVelocity;
         }
@@ -165,7 +198,18 @@ public class PlayerMovement : MonoBehaviour
 
     private IEnumerator OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Finish"))
+        if (other.CompareTag("NoScaleChangeZone"))
+        {
+            isCollidingNoScaleChangeZone = true;
+        }
+        else if (other.CompareTag("DisableNoSpawnZoneBtn"))
+        {
+            foreach (var obj in GameObject.FindGameObjectsWithTag("NoSpawnZone"))
+            {
+                obj.SetActive(false);
+            }
+        }
+        else if (other.CompareTag("Finish"))
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         }
@@ -195,16 +239,38 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.CompareTag("NoScaleChangeZone"))
+        {
+            isCollidingNoScaleChangeZone = false;
+        }
+    }
+
     bool IsCollidingRespawn()
     {
-        Collider2D[] colliders = Physics2D.OverlapBoxAll(deathCheck.position, new Vector2(.1f, deathCheckHeight * (transform.localScale.y)), 0, deathLayer);
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(deathCheck.position, new Vector2(.1f, deathCheckHeight * (transform.localScale.y)), 0, groundLayer);
         print("IsCollidingRespawn() = " + (colliders.Length > 0));
         return colliders.Length > 0;
     }
 
     bool CanScaleUp()
     {
-        Collider2D[] colliders = Physics2D.OverlapBoxAll(scaleUpPossibilityCheck.position, new Vector2(scaleUpCheckWidth * transform.localScale.x, .1f), 0, deathLayer);
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(scaleUpPossibilityCheck.position, new Vector2(scaleCheckWidth * transform.localScale.x, .1f), 0, groundLayer);
+        print("CanScaleUp() = " + (colliders.Length == 0));
+        return colliders.Length == 0;
+    }
+
+    bool IsCollidingHydraulicPress()
+    {
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(scaleUpPossibilityCheck.position, new Vector2(scaleCheckWidth * transform.localScale.x, .1f), 0, hydraulicPressLayer);
+        print("IsCollidingHydraulicPress() = " + (colliders.Length == 0));
+        return colliders.Length > 0;
+    }
+
+    bool CanScaleDown()
+    {
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(scaleDownPossibilityCheck.position, new Vector2(scaleCheckWidth * transform.localScale.x, .1f), 0, groundLayer);
         print("CanScaleUp() = " + (colliders.Length == 0));
         return colliders.Length == 0;
     }
@@ -326,6 +392,8 @@ public class PlayerMovement : MonoBehaviour
 
     public void ScaleCharacter(bool increaseYAxis)
     {
+        if ((!CanScaleUp() && !CanScaleDown()) || isCollidingNoScaleChangeZone) return;
+
         if (transform.localScale.y < 0.2f)
         {
             transform.localScale = new Vector2(3.8f, 0.2f);
@@ -363,13 +431,10 @@ public class PlayerMovement : MonoBehaviour
 
         //rb.gravityScale = newGravityScale;
 
-        if (newPlayerScale.y < transform.localScale.y)
+        if (newPlayerScale.y < transform.localScale.y || !CanScaleUp())
             transform.position = new Vector2(transform.position.x, transform.position.y - 0.04f);
-        else
-        {
-            if (!CanScaleUp()) return;
+        else if (newPlayerScale.y > transform.localScale.y || !CanScaleDown())
             transform.position = new Vector2(transform.position.x, transform.position.y + 0.04f);
-        }
 
         transform.localScale = newPlayerScale;
     }
@@ -384,6 +449,7 @@ public class PlayerMovement : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(deathCheck.position, new Vector2(.1f, deathCheckHeight * (transform.localScale.y)));
         Gizmos.color = Color.cyan;
-        Gizmos.DrawWireCube(scaleUpPossibilityCheck.position, new Vector2(scaleUpCheckWidth * transform.localScale.x, .1f));
+        Gizmos.DrawWireCube(scaleUpPossibilityCheck.position, new Vector2(scaleCheckWidth * transform.localScale.x, .1f));
+        Gizmos.DrawWireCube(scaleDownPossibilityCheck.position, new Vector2(scaleCheckWidth * transform.localScale.x, .1f));
     }
 }
