@@ -271,7 +271,7 @@ public class PlayerMovement : MonoBehaviour
     bool CanScaleDown()
     {
         Collider2D[] colliders = Physics2D.OverlapBoxAll(scaleDownPossibilityCheck.position, new Vector2(scaleCheckWidth * transform.localScale.x, .1f), 0, groundLayer);
-        print("CanScaleUp() = " + (colliders.Length == 0));
+        print("CanScaleDown() = " + (colliders.Length == 0));
         return colliders.Length == 0;
     }
 
@@ -285,7 +285,7 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        if (IsCollidingRespawn() || collision.collider.CompareTag("Kostyl"))
+        if (collision.collider.CompareTag("Respawn") || IsCollidingRespawn() || collision.collider.CompareTag("Kostyl"))
         {
             print("5.0.2");
             RestartLevel();
@@ -431,9 +431,9 @@ public class PlayerMovement : MonoBehaviour
 
         //rb.gravityScale = newGravityScale;
 
-        if (newPlayerScale.y < transform.localScale.y || !CanScaleUp())
+        if (newPlayerScale.y < transform.localScale.y || (!CanScaleUp() && CanScaleDown()))
             transform.position = new Vector2(transform.position.x, transform.position.y - 0.04f);
-        else if (newPlayerScale.y > transform.localScale.y || !CanScaleDown())
+        else if (newPlayerScale.y > transform.localScale.y || (CanScaleUp() && !CanScaleDown()))
             transform.position = new Vector2(transform.position.x, transform.position.y + 0.04f);
 
         transform.localScale = newPlayerScale;
