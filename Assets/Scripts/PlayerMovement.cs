@@ -47,6 +47,9 @@ public class PlayerMovement : MonoBehaviour
 
     Animator anim;
 
+    [SerializeField] Sprite activatedDisableNoSpawnBtn;
+    [SerializeField] Image finishImage;
+
     /*bool isGrounded;
     [SerializeField] Transform feetPos;
     [SerializeField] float checkRadius;
@@ -200,6 +203,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (other.CompareTag("DisableNoSpawnZoneBtn"))
         {
+            other.GetComponent<SpriteRenderer>().sprite = activatedDisableNoSpawnBtn;
             foreach (var obj in GameObject.FindGameObjectsWithTag("NoSpawnZone"))
             {
                 obj.SetActive(false);
@@ -207,14 +211,19 @@ public class PlayerMovement : MonoBehaviour
         }
         else if (other.CompareTag("Finish"))
         {
+            FindObjectOfType<MusicManager>().PlayWinSound();
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         }
         else if (other.CompareTag("GameFinish"))
         {
-            other.GetComponent<AudioSource>().Play();
+            FindObjectOfType<MusicManager>().PlayWinSound();
+            FindObjectOfType<MusicManager>().DisableAllMusic();
             speedState = SpeedState.Paused;
             canChangeSpeed = false;
-            yield return new WaitForSeconds(other.GetComponent<AudioSource>().clip.length);
+            finishImage.gameObject.SetActive(true);
+            finishImage.DOColor(new Color(0, 0, 0, 255), 2f);
+            finishImage.GetComponentInChildren<TMP_Text>().DOColor(new Color(255, 255, 255, 255), 2f);
+            yield return new WaitForSeconds(6);
             SceneManager.LoadScene(0);
         }
         yield return new WaitUntil(() => speedState != SpeedState.Paused);
@@ -392,7 +401,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void ScaleCharacter(bool increaseYAxis)
     {
-        if ((!CanScaleUp() && !CanScaleDown()) || isCollidingNoScaleChangeZone) return;
+        if (isCollidingNoScaleChangeZone) return;
 
         if (transform.localScale.y < 0.2f)
         {
@@ -428,6 +437,8 @@ public class PlayerMovement : MonoBehaviour
             canBeScaled = true;
             return;
         }
+
+        if (newPlayerScale.y > transform.localScale.y && !CanScaleUp() && !CanScaleDown()) return;
 
         //rb.gravityScale = newGravityScale;
 

@@ -71,6 +71,7 @@ MonoBehaviour:
   deathCheckHeight: 1.8
   canChangeSpeed: 1
   screenOff: {fileID: 3252276807212880586}
+  activatedDisableNoSpawnBtn: {fileID: 768992641, guid: 4270a8555551337489151b00df33f8eb, type: 3}
 --- !u!50 &2458753452819802323
 Rigidbody2D:
   serializedVersion: 4
