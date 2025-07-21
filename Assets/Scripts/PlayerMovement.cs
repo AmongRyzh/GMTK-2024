@@ -399,6 +399,65 @@ public class PlayerMovement : MonoBehaviour
         }
     }*/
 
+    /*public void ScaleCharacter(float newYScale)
+    {
+        if (isCollidingNoScaleChangeZone) return;
+
+        if (transform.localScale.y < 0.2f)
+        {
+            transform.localScale = new Vector2(3.8f, 0.2f);
+            return;
+        }
+        else if (transform.localScale.y > 3.8f)
+        {
+            transform.localScale = new Vector2(0.2f, 3.8f);
+            return;
+        }
+
+        /*Vector2 newPositiveYScale;
+        Vector2 newNegativeYScale;
+
+        if (transform.localScale.x > 0)
+        {
+            newPositiveYScale = new Vector2(transform.localScale.x - 0.04f, transform.localScale.y + 0.04f);
+            newNegativeYScale = new Vector2(transform.localScale.x + 0.04f, transform.localScale.y - 0.04f);
+        }
+        else
+        {
+            newPositiveYScale = new Vector2(transform.localScale.x + 0.04f, transform.localScale.y + 0.04f);
+            newNegativeYScale = new Vector2(transform.localScale.x - 0.04f, transform.localScale.y - 0.04f);
+        }
+
+        float newGravityScale = increaseYAxis == true ? rb.gravityScale - 0.024f : rb.gravityScale + 0.024f;
+
+        Vector2 newPlayerScale = increaseYAxis == true ? newPositiveYScale : newNegativeYScale;*//*
+
+        //bool increaseYAxis = newYScale > transform.localScale.y;
+
+        float diffY = newYScale - transform.localScale.y;
+
+        float diffX = transform.localScale.x - diffY;
+
+        Vector2 newPlayerScale = new Vector2(diffX, diffY);
+
+        if (newPlayerScale.y > 3.8f || newPlayerScale.y < 0.2f/* && (newGravityScale > 1.6f || newGravityScale < 0.4f)*//*)
+        {
+            canBeScaled = true;
+            return;
+        }
+
+        if (newPlayerScale.y > transform.localScale.y && !CanScaleUp() && !CanScaleDown()) return;
+
+        //rb.gravityScale = newGravityScale;
+
+        /*if (newPlayerScale.y < transform.localScale.y || (!CanScaleUp() && CanScaleDown()))
+            transform.position = new Vector2(transform.position.x, transform.position.y - diffY);
+        else if (newPlayerScale.y > transform.localScale.y || (CanScaleUp() && !CanScaleDown()))
+            transform.position = new Vector2(transform.position.x, transform.position.y + diffY);*//*
+
+        transform.localScale = newPlayerScale;
+    }*/
+
     public void ScaleCharacter(bool increaseYAxis)
     {
         if (isCollidingNoScaleChangeZone) return;
